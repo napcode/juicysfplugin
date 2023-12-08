@@ -37,15 +37,15 @@ public:
     
     virtual void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged,
                                            const juce::Identifier& property) override;
-    inline virtual void valueTreeChildAdded (juce::ValueTree& parentTree,
-                                             juce::ValueTree& childWhichHasBeenAdded) override {};
-    inline virtual void valueTreeChildRemoved (juce::ValueTree& parentTree,
-                                               juce::ValueTree& childWhichHasBeenRemoved,
-                                               int indexFromWhichChildWasRemoved) override {};
-    inline virtual void valueTreeChildOrderChanged (juce::ValueTree& parentTreeWhoseChildrenHaveMoved,
-                                                    int oldIndex, int newIndex) override {};
-    inline virtual void valueTreeParentChanged (juce::ValueTree& treeWhoseParentHasChanged) override {};
-    inline virtual void valueTreeRedirected (juce::ValueTree& treeWhichHasBeenChanged) override {};
+    inline virtual void valueTreeChildAdded ([[maybe_unused]] juce::ValueTree& parentTree,
+                                             [[maybe_unused]] juce::ValueTree& childWhichHasBeenAdded) override {};
+    inline virtual void valueTreeChildRemoved ([[maybe_unused]] juce::ValueTree& parentTree,
+                                               [[maybe_unused]] juce::ValueTree& childWhichHasBeenRemoved,
+                                               [[maybe_unused]] int indexFromWhichChildWasRemoved) override {};
+    inline virtual void valueTreeChildOrderChanged ([[maybe_unused]] juce::ValueTree& parentTreeWhoseChildrenHaveMoved,
+                                                    [[maybe_unused]] int oldIndex, [[maybe_unused]] int newIndex) override {};
+    inline virtual void valueTreeParentChanged ([[maybe_unused]] juce::ValueTree& treeWhoseParentHasChanged) override {};
+    inline virtual void valueTreeRedirected ([[maybe_unused]] juce::ValueTree& treeWhichHasBeenChanged) override {};
 
     //==============================================================================
     int getNumPrograms();
@@ -55,30 +55,30 @@ public:
     void changeProgramName(int index, const juce::String& newName);
 
 private:
-    static const juce::StringArray programChangeParams;
+    static const juce::StringArray _programChangeParams;
 
     // there's no bimap in the standard library!
-    static const map<fluid_midi_control_change, juce::String> controllerToParam;
-    static const map<juce::String, fluid_midi_control_change> paramToController;
+    static const map<fluid_midi_control_change, juce::String> _controllerToParam;
+    static const map<juce::String, fluid_midi_control_change> _paramToController;
 
     void refreshBanks();
 
-    juce::AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& _valueTreeState;
 
     // https://stackoverflow.com/questions/38980315/is-stdunique-ptr-deletion-order-guaranteed
     // members are destroyed in reverse of the order they're declared
     // http://www.fluidsynth.org/api/
     // in their examples, they destroy the synth before destroying the settings
-    unique_ptr<fluid_settings_t, decltype(&delete_fluid_settings)> settings;
-    unique_ptr<fluid_synth_t, decltype(&delete_fluid_synth)> synth;
+    unique_ptr<fluid_settings_t, decltype(&delete_fluid_settings)> _settings;
+    unique_ptr<fluid_synth_t, decltype(&delete_fluid_synth)> _synth;
 
-    float currentSampleRate;
+    float _currentSampleRate;
 
     void unloadAndLoadFont(const juce::String &absPath);
     void loadFont(const juce::String &absPath);
     
-    int sfont_id;
-    unsigned int channel;
+    int _sfont_id;
+    int _channel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FluidSynthModel)
 };

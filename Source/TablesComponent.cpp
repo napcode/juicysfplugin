@@ -13,30 +13,30 @@ using namespace placeholders;
 TablesComponent::TablesComponent(
     AudioProcessorValueTreeState& valueTreeState
 )
-: valueTreeState{valueTreeState}
-, banks{valueTreeState}
-, presetTable{valueTreeState}
+: _valueTreeState{valueTreeState}
+, _banks{valueTreeState}
+, _presetTable{valueTreeState}
 {
 
-    presetTable.setWantsKeyboardFocus(false);
+    _presetTable.setWantsKeyboardFocus(false);
 
-    addAndMakeVisible(presetTable);
+    addAndMakeVisible(_presetTable);
 
-    addAndMakeVisible(banks);
+    addAndMakeVisible(_banks);
 }
 
 void TablesComponent::resized() {
     Rectangle<int> r (getLocalBounds());
-    banks.setBounds (r.removeFromTop(27).reduced(5,0));
+    _banks.setBounds (r.removeFromTop(27).reduced(5,0));
 
-    presetTable.setBounds (r);
+    _presetTable.setBounds (r);
 }
 
 bool TablesComponent::keyPressed(const KeyPress &key) {
     if (key.getKeyCode() == KeyPress::leftKey
             || key.getKeyCode() == KeyPress::rightKey) {
-        banks.cycle(key.getKeyCode() == KeyPress::rightKey);
+        _banks.cycle(key.getKeyCode() == KeyPress::rightKey);
         return true;
     }
-    return presetTable.keyPressed(key);
+    return _presetTable.keyPressed(key);
 }

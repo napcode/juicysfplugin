@@ -8,8 +8,6 @@
 #include "Pills.h"
 #include "TableComponent.h"
 #include "FluidSynthModel.h"
-#include <memory>
-#include <fluidsynth.h>
 
 using namespace std;
 
@@ -25,10 +23,10 @@ public:
     bool keyPressed(const juce::KeyPress &key) override;
 
 private:
-    juce::AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& _valueTreeState;
 
-    Pills banks;
-    TableComponent presetTable;
+    Pills _banks;
+    TableComponent _presetTable;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TablesComponent)
 };

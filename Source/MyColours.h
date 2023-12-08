@@ -6,8 +6,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-class MyColours {
-public:
-    static juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::UIColour uiColour, juce::Colour fallback);
-
+namespace MyColours {
+    juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::UIColour uiColour, juce::Colour fallback);
 };

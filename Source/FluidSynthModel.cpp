@@ -21,7 +21,7 @@
 using namespace std;
 using namespace juce;
 
-const map<fluid_midi_control_change, String> FluidSynthModel::controllerToParam{
+const map<fluid_midi_control_change, String> FluidSynthModel::_controllerToParam{
     {SOUND_CTRL2, "filterResonance"}, // MIDI CC 71 Timbre/Harmonic Intensity (filter resonance)
     {SOUND_CTRL3, "release"}, // MIDI CC 72 Release time
     {SOUND_CTRL4, "attack"}, // MIDI CC 73 Attack time
@@ -29,11 +29,11 @@ const map<fluid_midi_control_change, String> FluidSynthModel::controllerToParam{
     {SOUND_CTRL6, "decay"}, // MIDI CC 75 Decay Time
     {SOUND_CTRL10, "sustain"}}; // MIDI CC 79 undefined
 
-const map<String, fluid_midi_control_change> FluidSynthModel::paramToController{[]{
+const map<String, fluid_midi_control_change> FluidSynthModel::_paramToController{[]{
     map<String, fluid_midi_control_change> map;
     transform(
-        controllerToParam.begin(),
-        controllerToParam.end(),
+        _controllerToParam.begin(),
+        _controllerToParam.end(),
         inserter(map, map.begin()),
         [](const pair<fluid_midi_control_change, String>& pair) {
             return make_pair(pair.second, pair.first);
@@ -44,28 +44,28 @@ const map<String, fluid_midi_control_change> FluidSynthModel::paramToController{
 FluidSynthModel::FluidSynthModel(
     AudioProcessorValueTreeState& valueTreeState
     )
-: valueTreeState{valueTreeState}
-, settings{nullptr, nullptr}
-, synth{nullptr, nullptr}
-, currentSampleRate{44100}
-, sfont_id{-1}
-, channel{0}
+: _valueTreeState{valueTreeState}
+, _settings{nullptr, nullptr}
+, _synth{nullptr, nullptr}
+, _currentSampleRate{44100}
+, _sfont_id{-1}
+, _channel{0}
 {
     valueTreeState.addParameterListener("bank", this);
     valueTreeState.addParameterListener("preset", this);
-    for (const auto &[param, controller]: paramToController) {
+    for (const auto &[param, controller]: _paramToController) {
         valueTreeState.addParameterListener(param, this);
     }
     valueTreeState.state.addListener(this);
 }
 
 FluidSynthModel::~FluidSynthModel() {
-    for (const auto &[param, controller]: paramToController) {
-        valueTreeState.removeParameterListener(param, this);
+    for (const auto &[param, controller]: _paramToController) {
+        _valueTreeState.removeParameterListener(param, this);
     }
-    valueTreeState.removeParameterListener("bank", this);
-    valueTreeState.removeParameterListener("preset", this);
-    valueTreeState.state.removeListener(this);
+    _valueTreeState.removeParameterListener("bank", this);
+    _valueTreeState.removeParameterListener("preset", this);
+    _valueTreeState.state.removeListener(this);
 }
 
 void FluidSynthModel::initialise() {
@@ -74,18 +74,18 @@ void FluidSynthModel::initialise() {
     const char *DRV[] {NULL};
     fluid_audio_driver_register(DRV);
     
-    settings = { new_fluid_settings(), delete_fluid_settings };
+    _settings = { new_fluid_settings(), delete_fluid_settings };
     
     // https://sourceforge.net/p/fluidsynth/wiki/FluidSettings/
 #if JUCE_DEBUG
-    fluid_settings_setint(settings.get(), "synth.verbose", 1);
+    fluid_settings_setint(settings.get(), "_synth.verbose", 1);
 #endif
 
-    synth = { new_fluid_synth(settings.get()), delete_fluid_synth };
-    fluid_synth_set_sample_rate(synth.get(), currentSampleRate);
+    _synth = { new_fluid_synth(_settings.get()), delete_fluid_synth };
+    fluid_synth_set_sample_rate(_synth.get(), _currentSampleRate);
 
     // I can't hear a damned thing
-    fluid_synth_set_gain(synth.get(), 2.0);
+    fluid_synth_set_gain(_synth.get(), 2.0);
     
     // note: fluid_chan.c#fluid_channel_init_ctrl()
     // > Just like panning, a value of 64 indicates no change for sound ctrls
@@ -95,7 +95,7 @@ void FluidSynthModel::initialise() {
     // i.e. we are forced to start at 0 and climb from there
     // --
     // let's zero out every audio param that we manage
-    for (const auto &[controller, param]: controllerToParam) {
+    for (const auto &[controller, param]: _controllerToParam) {
         setControllerValue(static_cast<int>(controller), 0);
     }
     
@@ -112,7 +112,7 @@ void FluidSynthModel::initialise() {
     fluid_mod_set_source2(mod.get(), 0, 0);
     fluid_mod_set_dest(mod.get(), GEN_FILTERQ);
     fluid_mod_set_amount(mod.get(), FLUID_PEAK_ATTENUATION);
-    fluid_synth_add_default_mod(synth.get(), mod.get(), FLUID_SYNTH_ADD);
+    fluid_synth_add_default_mod(_synth.get(), mod.get(), FLUID_SYNTH_ADD);
     
     mod = {new_fluid_mod(), delete_fluid_mod};
     fluid_mod_set_source1(mod.get(),
@@ -124,7 +124,7 @@ void FluidSynthModel::initialise() {
     fluid_mod_set_source2(mod.get(), 0, 0);
     fluid_mod_set_dest(mod.get(), GEN_VOLENVRELEASE);
     fluid_mod_set_amount(mod.get(), env_amount);
-    fluid_synth_add_default_mod(synth.get(), mod.get(), FLUID_SYNTH_ADD);
+    fluid_synth_add_default_mod(_synth.get(), mod.get(), FLUID_SYNTH_ADD);
     
     mod = {new_fluid_mod(), delete_fluid_mod};
     fluid_mod_set_source1(mod.get(),
@@ -136,7 +136,7 @@ void FluidSynthModel::initialise() {
     fluid_mod_set_source2(mod.get(), 0, 0);
     fluid_mod_set_dest(mod.get(), GEN_VOLENVATTACK);
     fluid_mod_set_amount(mod.get(), env_amount);
-    fluid_synth_add_default_mod(synth.get(), mod.get(), FLUID_SYNTH_ADD);
+    fluid_synth_add_default_mod(_synth.get(), mod.get(), FLUID_SYNTH_ADD);
     
     // soundfont spec says that if cutoff is >20kHz and resonance Q is 0, then no filtering occurs
     mod = {new_fluid_mod(), delete_fluid_mod};
@@ -149,7 +149,7 @@ void FluidSynthModel::initialise() {
         fluid_mod_set_source2(mod.get(), 0, 0);
     fluid_mod_set_dest(mod.get(), GEN_FILTERFC);
     fluid_mod_set_amount(mod.get(), -2400.0f);
-    fluid_synth_add_default_mod(synth.get(), mod.get(), FLUID_SYNTH_ADD);
+    fluid_synth_add_default_mod(_synth.get(), mod.get(), FLUID_SYNTH_ADD);
     
     mod = {new_fluid_mod(), delete_fluid_mod};
     fluid_mod_set_source1(mod.get(),
@@ -161,7 +161,7 @@ void FluidSynthModel::initialise() {
     fluid_mod_set_source2(mod.get(), 0, 0);
     fluid_mod_set_dest(mod.get(), GEN_VOLENVDECAY);
     fluid_mod_set_amount(mod.get(), env_amount);
-    fluid_synth_add_default_mod(synth.get(), mod.get(), FLUID_SYNTH_ADD);
+    fluid_synth_add_default_mod(_synth.get(), mod.get(), FLUID_SYNTH_ADD);
     
     mod = {new_fluid_mod(), delete_fluid_mod};
     fluid_mod_set_source1(mod.get(),
@@ -175,45 +175,45 @@ void FluidSynthModel::initialise() {
     // fluice_voice.c#fluid_voice_update_param()
     // clamps the range to between 0 and 1000, so we'll copy that
     fluid_mod_set_amount(mod.get(), 1000.0f);
-    fluid_synth_add_default_mod(synth.get(), mod.get(), FLUID_SYNTH_ADD);
+    fluid_synth_add_default_mod(_synth.get(), mod.get(), FLUID_SYNTH_ADD);
 }
 
-const StringArray FluidSynthModel::programChangeParams{"bank", "preset"};
+const StringArray FluidSynthModel::_programChangeParams{"bank", "preset"};
 void FluidSynthModel::parameterChanged(const String& parameterID, float newValue) {
-    if (programChangeParams.contains(parameterID)) {
+    if (_programChangeParams.contains(parameterID)) {
         int bank, preset;
         {
-            RangedAudioParameter *param{valueTreeState.getParameter("bank")};
+            RangedAudioParameter *param{_valueTreeState.getParameter("bank")};
             jassert(dynamic_cast<AudioParameterInt*>(param) != nullptr);
             AudioParameterInt* castParam{dynamic_cast<AudioParameterInt*>(param)};
             bank = castParam->get();
         }
         {
-            RangedAudioParameter *param{valueTreeState.getParameter("preset")};
+            RangedAudioParameter *param{_valueTreeState.getParameter("preset")};
             jassert(dynamic_cast<AudioParameterInt*>(param) != nullptr);
             AudioParameterInt* castParam{dynamic_cast<AudioParameterInt*>(param)};
             preset = castParam->get();
         }
-        int bankOffset{fluid_synth_get_bank_offset(synth.get(), sfont_id)};
+        int bankOffset{fluid_synth_get_bank_offset(_synth.get(), _sfont_id)};
         fluid_synth_program_select(
-            synth.get(),
-            channel,
-            sfont_id,
+            _synth.get(),
+            _channel,
+            _sfont_id,
             static_cast<unsigned int>(bankOffset + bank),
             static_cast<unsigned int>(preset));
     } else if (
         // https://stackoverflow.com/a/55482091/5257399
-        auto it{paramToController.find(parameterID)};
-        it != end(paramToController)) {
-        RangedAudioParameter *param{valueTreeState.getParameter(parameterID)};
+        auto it{_paramToController.find(parameterID)};
+        it != end(_paramToController)) {
+        RangedAudioParameter *param{_valueTreeState.getParameter(parameterID)};
         jassert(dynamic_cast<AudioParameterInt*>(param) != nullptr);
         AudioParameterInt* castParam{dynamic_cast<AudioParameterInt*>(param)};
         int value{castParam->get()};
         int controllerNumber{static_cast<int>(it->second)};
         
         fluid_synth_cc(
-            synth.get(),
-            channel,
+            _synth.get(),
+            _channel,
             controllerNumber,
             value);
     }
@@ -255,30 +255,30 @@ void FluidSynthModel::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasCh
 
 void FluidSynthModel::setControllerValue(int controller, int value) {
     fluid_synth_cc(
-        synth.get(),
-        channel,
+        _synth.get(),
+        _channel,
         controller,
         value);
 }
 
 int FluidSynthModel::getChannel() {
-    return channel;
+    return _channel;
 }
 
 void FluidSynthModel::unloadAndLoadFont(const String &absPath) {
     // in the base case, there is no font loaded
-    if (fluid_synth_sfcount(synth.get()) > 0) {
+    if (fluid_synth_sfcount(_synth.get()) > 0) {
         // if -1 is returned, that indicates failure
         // not really sure how to handle "fail to unload"
-        fluid_synth_sfunload(synth.get(), sfont_id, 1);
-        sfont_id = -1;
+        fluid_synth_sfunload(_synth.get(), _sfont_id, 1);
+        _sfont_id = -1;
     }
     loadFont(absPath);
 }
 
 void FluidSynthModel::loadFont(const String &absPath) {
     if (!absPath.isEmpty()) {
-        sfont_id = fluid_synth_sfload(synth.get(), absPath.toStdString().c_str(), 1);
+        _sfont_id = fluid_synth_sfload(_synth.get(), absPath.toStdString().c_str(), 1);
         // if -1 is returned, that indicates failure
     }
     // refresh regardless of success, if only to clear the table
@@ -288,9 +288,9 @@ void FluidSynthModel::loadFont(const String &absPath) {
 void FluidSynthModel::refreshBanks() {
     ValueTree banks{"banks"};
     fluid_sfont_t* sfont{
-        sfont_id == -1
+        _sfont_id == -1
         ? nullptr
-        : fluid_synth_get_sfont_by_id(synth.get(), sfont_id)
+        : fluid_synth_get_sfont_by_id(_synth.get(), _sfont_id)
     };
     if (sfont) {
         int greatestEncounteredBank{-1};
@@ -319,24 +319,24 @@ void FluidSynthModel::refreshBanks() {
             banks.appendChild(bank, nullptr);
         }
     }
-    valueTreeState.state.getChildWithName("banks").copyPropertiesAndChildrenFrom(banks, nullptr);
-    valueTreeState.state.getChildWithName("banks").sendPropertyChangeMessage("synthetic");
+    _valueTreeState.state.getChildWithName("banks").copyPropertiesAndChildrenFrom(banks, nullptr);
+    _valueTreeState.state.getChildWithName("banks").sendPropertyChangeMessage("synthetic");
     
 #if JUCE_DEBUG
-//    unique_ptr<XmlElement> xml{valueTreeState.state.createXml()};
+//    unique_ptr<XmlElement> xml{_valueTreeState.state.createXml()};
 //    Logger::outputDebugString(xml->createDocument("",false,false));
 #endif
 }
 
 void FluidSynthModel::setSampleRate(float sampleRate) {
-    currentSampleRate = sampleRate;
+    _currentSampleRate = sampleRate;
     // https://stackoverflow.com/a/40856043/5257399
     // test if a smart pointer is null
-    if (!synth) {
+    if (!_synth) {
         // don't worry; we'll do this in initialise phase regardless
         return;
     }
-    fluid_synth_set_sample_rate(synth.get(), sampleRate);
+    fluid_synth_set_sample_rate(_synth.get(), sampleRate);
 }
 
 void FluidSynthModel::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages) {
@@ -349,27 +349,27 @@ void FluidSynthModel::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiM
         
         if (m.isNoteOn()) {
             fluid_synth_noteon(
-                synth.get(),
-                channel,
+                _synth.get(),
+                _channel,
                 m.getNoteNumber(),
                 m.getVelocity());
         } else if (m.isNoteOff()) {
             fluid_synth_noteoff(
-                synth.get(),
-                channel,
+                _synth.get(),
+                _channel,
                 m.getNoteNumber());
         } else if (m.isController()) {
             fluid_synth_cc(
-                synth.get(),
-                channel,
+                _synth.get(),
+                _channel,
                 m.getControllerNumber(),
                 m.getControllerValue());
 
             fluid_midi_control_change controllerNum{static_cast<fluid_midi_control_change>(m.getControllerNumber())};
-            if (auto it{controllerToParam.find(controllerNum)};
-                it != end(controllerToParam)) {
+            if (auto it{_controllerToParam.find(controllerNum)};
+                it != end(_controllerToParam)) {
                 String parameterID{it->second};
-                RangedAudioParameter *param{valueTreeState.getParameter(parameterID)};
+                RangedAudioParameter *param{_valueTreeState.getParameter(parameterID)};
                 jassert(dynamic_cast<AudioParameterInt*>(param) != nullptr);
                 AudioParameterInt* castParam{dynamic_cast<AudioParameterInt*>(param)};
                 *castParam = m.getControllerValue();
@@ -381,39 +381,39 @@ void FluidSynthModel::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiM
             Logger::outputDebugString(debug);
 #endif
             int result{fluid_synth_program_change(
-                synth.get(),
-                channel,
+                _synth.get(),
+                _channel,
                 m.getProgramChangeNumber())};
             if (result == FLUID_OK) {
-                RangedAudioParameter *param{valueTreeState.getParameter("preset")};
+                RangedAudioParameter *param{_valueTreeState.getParameter("preset")};
                 jassert(dynamic_cast<AudioParameterInt*>(param) != nullptr);
                 AudioParameterInt* castParam{dynamic_cast<AudioParameterInt*>(param)};
                 *castParam = m.getProgramChangeNumber();
             }
         } else if (m.isPitchWheel()) {
             fluid_synth_pitch_bend(
-                synth.get(),
-                channel,
+                _synth.get(),
+                _channel,
                 m.getPitchWheelValue());
         } else if (m.isChannelPressure()) {
             fluid_synth_channel_pressure(
-                synth.get(),
-                channel,
+                _synth.get(),
+                _channel,
                 m.getChannelPressureValue());
         } else if (m.isAftertouch()) {
             fluid_synth_key_pressure(
-                synth.get(),
-                channel,
+                _synth.get(),
+                _channel,
                 m.getNoteNumber(),
                 m.getAfterTouchValue());
 //        } else if (m.isMetaEvent()) {
 //            fluid_midi_event_t *midi_event{new_fluid_midi_event()};
 //            fluid_midi_event_set_type(midi_event, static_cast<int>(MIDI_SYSTEM_RESET));
-//            fluid_synth_handle_midi_event(synth.get(), midi_event);
+//            fluid_synth_handle_midi_event(_synth.get(), midi_event);
 //            delete_fluid_midi_event(midi_event);
         } else if (m.isSysEx()) {
             fluid_synth_sysex(
-                synth.get(),
+                _synth.get(),
                 reinterpret_cast<const char*>(m.getSysExData()),
                 m.getSysExDataSize(),
                 nullptr, // no response pointer because we have no interest in handling response currently
@@ -427,7 +427,7 @@ void FluidSynthModel::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiM
     // Logger::outputDebugString ( juce::String::formatted("hey: %d\n", pval) );
 
     fluid_synth_process(
-        synth.get(),
+        _synth.get(),
         buffer.getNumSamples(),
         0,
         nullptr,
@@ -443,7 +443,7 @@ int FluidSynthModel::getNumPrograms()
 
 int FluidSynthModel::getCurrentProgram()
 {
-    RangedAudioParameter *param{valueTreeState.getParameter("preset")};
+    RangedAudioParameter *param{_valueTreeState.getParameter("preset")};
     jassert(dynamic_cast<AudioParameterInt*>(param) != nullptr);
     AudioParameterInt* castParam{dynamic_cast<AudioParameterInt*>(param)};
     return castParam->get();
@@ -451,7 +451,7 @@ int FluidSynthModel::getCurrentProgram()
 
 void FluidSynthModel::setCurrentProgram(int index)
 {
-    RangedAudioParameter *param{valueTreeState.getParameter("preset")};
+    RangedAudioParameter *param{_valueTreeState.getParameter("preset")};
     jassert(dynamic_cast<AudioParameterInt*>(param) != nullptr);
     AudioParameterInt* castParam{dynamic_cast<AudioParameterInt*>(param)};
     // setCurrentProgram() gets invoked from non-message thread.
@@ -465,15 +465,15 @@ void FluidSynthModel::setCurrentProgram(int index)
 const String FluidSynthModel::getProgramName(int index)
 {
      fluid_sfont_t* sfont{
-         sfont_id == -1
+         _sfont_id == -1
          ? nullptr
-         : fluid_synth_get_sfont_by_id(synth.get(), sfont_id)
+         : fluid_synth_get_sfont_by_id(_synth.get(), _sfont_id)
      };
      if (!sfont) {
          String presetName{"Preset "};
          return presetName << index;
      }
-     RangedAudioParameter *param{valueTreeState.getParameter("bank")};
+     RangedAudioParameter *param{_valueTreeState.getParameter("bank")};
      jassert(dynamic_cast<AudioParameterInt*>(param) != nullptr);
      AudioParameterInt* castParam{dynamic_cast<AudioParameterInt*>(param)};
      int bank{castParam->get()};

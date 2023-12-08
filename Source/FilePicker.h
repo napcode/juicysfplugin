@@ -5,7 +5,6 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "FluidSynthModel.h"
 
 #if JUCE_MAC || JUCE_IOS
 //   #include <CoreFoundation/CoreFoundation.h>
@@ -31,22 +30,22 @@ public:
 
     virtual void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged,
                                            const juce::Identifier& property) override;
-    inline virtual void valueTreeChildAdded (juce::ValueTree& parentTree,
-                                             juce::ValueTree& childWhichHasBeenAdded) override {};
-    inline virtual void valueTreeChildRemoved (juce::ValueTree& parentTree,
-                                               juce::ValueTree& childWhichHasBeenRemoved,
-                                               int indexFromWhichChildWasRemoved) override {};
-    inline virtual void valueTreeChildOrderChanged (juce::ValueTree& parentTreeWhoseChildrenHaveMoved,
-                                                    int oldIndex, int newIndex) override {};
-    inline virtual void valueTreeParentChanged (juce::ValueTree& treeWhoseParentHasChanged) override {};
-    inline virtual void valueTreeRedirected (juce::ValueTree& treeWhichHasBeenChanged) override {};
+    inline virtual void valueTreeChildAdded ([[maybe_unused]] juce::ValueTree& parentTree,
+                                             [[maybe_unused]] juce::ValueTree& childWhichHasBeenAdded) override {};
+    inline virtual void valueTreeChildRemoved ([[maybe_unused]] juce::ValueTree& parentTree,
+                                               [[maybe_unused]] juce::ValueTree& childWhichHasBeenRemoved,
+                                               [[maybe_unused]] int indexFromWhichChildWasRemoved) override {};
+    inline virtual void valueTreeChildOrderChanged ([[maybe_unused]] juce::ValueTree& parentTreeWhoseChildrenHaveMoved,
+                                                    [[maybe_unused]] int oldIndex, [[maybe_unused]] int newIndex) override {};
+    inline virtual void valueTreeParentChanged ([[maybe_unused]] juce::ValueTree& treeWhoseParentHasChanged) override {};
+    inline virtual void valueTreeRedirected ([[maybe_unused]] juce::ValueTree& treeWhichHasBeenChanged) override {};
 private:
-    juce::FilenameComponent fileChooser;
+    juce::FilenameComponent _fileChooser;
 
-    juce::AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& _valueTreeState;
     // FluidSynthModel& fluidSynthModel;
 
-    juce::String currentPath;
+    juce::String _currentPath;
 
 #if JUCE_MAC || JUCE_IOS
     CFURLBookmarkCreationOptions bookmarkCreationOptions;

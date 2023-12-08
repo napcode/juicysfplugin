@@ -25,8 +25,8 @@ private:
     /** 1-indexed */
     juce::String getStringContents(int columnId);
 
-    int preset;
-    juce::String name;
+    int _preset;
+    juce::String _name;
     
     friend class TableComponent;
 };
@@ -74,29 +74,29 @@ public:
 
     virtual void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged,
                                            const juce::Identifier& property) override;
-    inline virtual void valueTreeChildAdded (juce::ValueTree& parentTree,
-                                             juce::ValueTree& childWhichHasBeenAdded) override {};
-    inline virtual void valueTreeChildRemoved (juce::ValueTree& parentTree,
-                                               juce::ValueTree& childWhichHasBeenRemoved,
-                                               int indexFromWhichChildWasRemoved) override {};
-    inline virtual void valueTreeChildOrderChanged (juce::ValueTree& parentTreeWhoseChildrenHaveMoved,
-                                                    int oldIndex, int newIndex) override {};
-    inline virtual void valueTreeParentChanged (juce::ValueTree& treeWhoseParentHasChanged) override {};
-    inline virtual void valueTreeRedirected (juce::ValueTree& treeWhichHasBeenChanged) override {};
+    inline virtual void valueTreeChildAdded ([[maybe_unused]] juce::ValueTree& parentTree,
+                                             [[maybe_unused]] juce::ValueTree& childWhichHasBeenAdded) override {};
+    inline virtual void valueTreeChildRemoved ([[maybe_unused]] juce::ValueTree& parentTree,
+                                               [[maybe_unused]] juce::ValueTree& childWhichHasBeenRemoved,
+                                               [[maybe_unused]] int indexFromWhichChildWasRemoved) override {};
+    inline virtual void valueTreeChildOrderChanged ([[maybe_unused]] juce::ValueTree& parentTreeWhoseChildrenHaveMoved,
+                                                    [[maybe_unused]] int oldIndex, [[maybe_unused]] int newIndex) override {};
+    inline virtual void valueTreeParentChanged ([[maybe_unused]] juce::ValueTree& treeWhoseParentHasChanged) override {};
+    inline virtual void valueTreeRedirected ([[maybe_unused]] juce::ValueTree& treeWhichHasBeenChanged) override {};
 private:
     void loadModelFrom(juce::ValueTree& banks);
     void repopulateTable();
     void selectCurrentPreset();
 
-    juce::AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& _valueTreeState;
 
-    juce::TableListBox table;     // the table component itself
-    juce::Font font;
+    juce::TableListBox _table;     // the table component itself
+    juce::Font _font;
 
     typedef multimap<int, TableRow> BanksToPresets;
-    BanksToPresets banksToPresets;
+    BanksToPresets _banksToPresets;
 
-    vector<TableRow> rows;
+    vector<TableRow> _rows;
 
     // A comparator used to sort our data when the user clicks a column header
     class DataSorter {
@@ -112,8 +112,8 @@ private:
         );
 
     private:
-        int columnByWhichToSort;
-        int direction;
+        int _columnByWhichToSort;
+        int _direction;
     };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TableComponent)

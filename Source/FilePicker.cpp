@@ -23,7 +23,7 @@ FilePicker::FilePicker(
     AudioProcessorValueTreeState& valueTreeState
     // FluidSynthModel& fluidSynthModel
 )
-: fileChooser{
+: _fileChooser{
     "File",
     File(),
     true,
@@ -32,7 +32,7 @@ FilePicker::FilePicker(
     "*.sf2;*.sf3",
     String(),
     "Choose a Soundfont file to load into the synthesizer"}
-, valueTreeState{valueTreeState}
+, _valueTreeState{valueTreeState}
 // , fluidSynthModel{fluidSynthModel}
 // , currentPath{}
 #if JUCE_MAC || JUCE_IOS
@@ -43,11 +43,11 @@ FilePicker::FilePicker(
     setOpaque (true);
 
     // setDisplayedFilePath(fluidSynthModel.getCurrentSoundFontAbsPath());
-    setDisplayedFilePath(valueTreeState.state.getChildWithName("soundFont").getProperty("path", ""));
+    setDisplayedFilePath(_valueTreeState.state.getChildWithName("soundFont").getProperty("path", ""));
 
-    addAndMakeVisible (fileChooser);
-    fileChooser.addListener (this);
-    valueTreeState.state.addListener(this);
+    addAndMakeVisible (_fileChooser);
+    _fileChooser.addListener (this);
+    _valueTreeState.state.addListener(this);
 //    valueTreeState.state.getChildWithName("soundFont").sendPropertyChangeMessage("path");
 
 #if JUCE_MAC || JUCE_IOS
@@ -55,13 +55,13 @@ FilePicker::FilePicker(
 #endif
 }
 FilePicker::~FilePicker() {
-    fileChooser.removeListener (this);
-    valueTreeState.state.removeListener(this);
+    _fileChooser.removeListener (this);
+    _valueTreeState.state.removeListener(this);
 }
 
 void FilePicker::resized() {
     Rectangle<int> r (getLocalBounds());
-    fileChooser.setBounds (r);
+    _fileChooser.setBounds (r);
 }
 
 /**
@@ -74,7 +74,7 @@ void FilePicker::paint(Graphics& g)
 
 void FilePicker::filenameComponentChanged (FilenameComponent*) {
 #if JUCE_MAC || JUCE_IOS
-    CFUniquePtr<CFStringRef> fileExtensionCF{fileChooser.getCurrentFile().getFullPathName().toCFString()};
+    CFUniquePtr<CFStringRef> fileExtensionCF{_fileChooser.getCurrentFile().getFullPathName().toCFString()};
     CFUniquePtr<CFURLRef> cfURL{CFURLCreateWithFileSystemPath(NULL, fileExtensionCF.get(), CFURLPathStyle::kCFURLPOSIXPathStyle, false)};
     CFErrorRef* cfError;
 
@@ -91,11 +91,11 @@ void FilePicker::filenameComponentChanged (FilenameComponent*) {
         value.setValue(var);
     }
 #endif
-    // currentPath = fileChooser.getCurrentFile().getFullPathName();
-    // fluidSynthModel.onFileNameChanged(fileChooser.getCurrentFile().getFullPathName(), -1, -1);
-    Value value{valueTreeState.state.getChildWithName("soundFont").getPropertyAsValue("path", nullptr)};
-    value.setValue(fileChooser.getCurrentFile().getFullPathName());
-//    value = fileChooser.getCurrentFile().getFullPathName();
+    // currentPath = _fileChooser.getCurrentFile().getFullPathName();
+    // fluidSynthModel.onFileNameChanged(_fileChooser.getCurrentFile().getFullPathName(), -1, -1);
+    Value value{_valueTreeState.state.getChildWithName("soundFont").getPropertyAsValue("path", nullptr)};
+    value.setValue(_fileChooser.getCurrentFile().getFullPathName());
+//    value = _fileChooser.getCurrentFile().getFullPathName();
 }
 
 void FilePicker::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged,
@@ -118,14 +118,14 @@ void FilePicker::setDisplayedFilePath(const String& path) {
          return;
      }
     // currentPath = path;
-    fileChooser.setCurrentFile(File(path), true, dontSendNotification);
+    _fileChooser.setCurrentFile(File(path), true, dontSendNotification);
 }
 
 bool FilePicker::shouldChangeDisplayedFilePath(const String &path) {
     if (path.isEmpty()) {
         return false;
     }
-    if (path == currentPath) {
+    if (path == _currentPath) {
         return false;
     }
     return true;

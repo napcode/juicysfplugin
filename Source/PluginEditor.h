@@ -10,12 +10,11 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
-#include "PluginProcessor.h"
 #include "TablesComponent.h"
 #include "SurjectiveMidiKeyboardComponent.h"
 #include "FilePicker.h"
 #include "SlidersComponent.h"
+#include "../JuceLibraryCode/JuceHeader.h"
 
 using juce::SurjectiveMidiKeyboardComponent;
 
@@ -45,21 +44,21 @@ private:
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    JuicySFAudioProcessor& processor;
+    JuicySFAudioProcessor& _processor;
 
-    juce::AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& _valueTreeState;
 
     // these are used to persist the UI's size - the values are stored along with the
     // filter's other parameters, and the UI component will update them when it gets
     // resized.
-    juce::Value lastUIWidth, lastUIHeight;
+    juce::Value _lastUIWidth, _lastUIHeight;
 
-    juce::SurjectiveMidiKeyboardComponent midiKeyboard;
-    TablesComponent tablesComponent;
-    FilePicker filePicker;
-    SlidersComponent slidersComponent;
+    juce::SurjectiveMidiKeyboardComponent _midiKeyboard;
+    TablesComponent _tablesComponent;
+    FilePicker _filePicker;
+    SlidersComponent _slidersComponent;
 
-    bool focusInitialized;
+    bool _focusInitialized;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuicySFAudioProcessorEditor)
 };

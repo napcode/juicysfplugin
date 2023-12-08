@@ -18,9 +18,6 @@ using namespace juce;
 using namespace std;
 using Parameter = AudioProcessorValueTreeState::Parameter;
 
-AudioProcessor* JUCE_CALLTYPE createPluginFilter();
-
-
 //==============================================================================
 JuicySFAudioProcessor::JuicySFAudioProcessor()
 : AudioProcessor{getBusesProperties()}
@@ -125,7 +122,7 @@ const String JuicySFAudioProcessor::getProgramName(int index)
     return fluidSynthModel.getProgramName(index);
 }
 
-void JuicySFAudioProcessor::changeProgramName (int index, const String& newName)
+void JuicySFAudioProcessor::changeProgramName ([[maybe_unused]] int index, [[maybe_unused]] const String& newName)
 {
 }
 
