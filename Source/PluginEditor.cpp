@@ -12,6 +12,8 @@
 #include "PluginEditor.h"
 #include "GuiConstants.h"
 
+using namespace juce;
+
 //==============================================================================
 JuicySFAudioProcessorEditor::JuicySFAudioProcessorEditor(
     JuicySFAudioProcessor& p,

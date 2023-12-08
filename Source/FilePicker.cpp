@@ -17,6 +17,8 @@
   using juce::CFUniquePtr;
 #endif
 
+using namespace juce;
+
 FilePicker::FilePicker(
     AudioProcessorValueTreeState& valueTreeState
     // FluidSynthModel& fluidSynthModel

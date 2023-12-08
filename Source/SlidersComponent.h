@@ -4,13 +4,13 @@
 #include "FluidSynthModel.h"
 
 using namespace std;
-using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
+using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
 
-class SlidersComponent : public Component
+class SlidersComponent : public juce::Component
 {
 public:
     SlidersComponent(
-        AudioProcessorValueTreeState& valueTreeState,
+        juce::AudioProcessorValueTreeState& valueTreeState,
         FluidSynthModel& fluidSynthModel);
     ~SlidersComponent();
 
@@ -21,37 +21,37 @@ public:
     void acceptMidiControlEvent(int controller, int value);
 
 private:
-    std::function<void()> makeSliderListener(Slider& slider, int controller);
+    std::function<void()> makeSliderListener(juce::Slider& slider, int controller);
 
-    AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& valueTreeState;
     FluidSynthModel& fluidSynthModel;
 
-    GroupComponent envelopeGroup;
+    juce::GroupComponent envelopeGroup;
 
-    Slider attackSlider;
-    Label attackLabel;
+    juce::Slider attackSlider;
+    juce::Label attackLabel;
     unique_ptr<SliderAttachment> attackSliderAttachment;
 
-    Slider decaySlider;
-    Label decayLabel;
+    juce::Slider decaySlider;
+    juce::Label decayLabel;
     unique_ptr<SliderAttachment> decaySliderAttachment;
 
-    Slider sustainSlider;
-    Label sustainLabel;
+    juce::Slider sustainSlider;
+    juce::Label sustainLabel;
     unique_ptr<SliderAttachment> sustainSliderAttachment;
 
-    Slider releaseSlider;
-    Label releaseLabel;
+    juce::Slider releaseSlider;
+    juce::Label releaseLabel;
     unique_ptr<SliderAttachment> releaseSliderAttachment;
 
-    GroupComponent filterGroup;
+    juce::GroupComponent filterGroup;
 
-    Slider filterCutOffSlider;
-    Label filterCutOffLabel;
+    juce::Slider filterCutOffSlider;
+    juce::Label filterCutOffLabel;
     unique_ptr<SliderAttachment> filterCutOffSliderAttachment;
 
-    Slider filterResonanceSlider;
-    Label filterResonanceLabel;
+    juce::Slider filterResonanceSlider;
+    juce::Label filterResonanceLabel;
     unique_ptr<SliderAttachment> filterResonanceSliderAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SlidersComponent)

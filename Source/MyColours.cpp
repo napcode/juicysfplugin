@@ -4,6 +4,8 @@
 
 #include "MyColours.h"
 
+using namespace juce;
+
 Colour MyColours::getUIColourIfAvailable (LookAndFeel_V4::ColourScheme::UIColour uiColour, Colour fallback = Colour (0xff4d4d4d)) {
     if (auto* v4 = dynamic_cast<LookAndFeel_V4*> (&LookAndFeel::getDefaultLookAndFeel()))
         return v4->getCurrentColourScheme().getUIColour (uiColour);

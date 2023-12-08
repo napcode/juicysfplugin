@@ -14,6 +14,7 @@
 #include "Util.h"
 #include "GuiConstants.h"
 
+using namespace juce;
 using namespace std;
 using Parameter = AudioProcessorValueTreeState::Parameter;
 

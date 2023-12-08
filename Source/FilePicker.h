@@ -12,49 +12,49 @@
   #include <CoreFoundation/CFURL.h>
 #endif
 
-class FilePicker: public Component,
-                  public ValueTree::Listener,
-                  private FilenameComponentListener
+class FilePicker: public juce::Component,
+                  public juce::ValueTree::Listener,
+                  private juce::FilenameComponentListener
 {
 public:
     FilePicker(
-        AudioProcessorValueTreeState& valueTreeState
+        juce::AudioProcessorValueTreeState& valueTreeState
         // FluidSynthModel& fluidSynthModel
     );
     ~FilePicker();
 
     void resized() override;
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
 
-    void setDisplayedFilePath(const String&);
+    void setDisplayedFilePath(const juce::String&);
     
 
-    virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
-                                           const Identifier& property) override;
-    inline virtual void valueTreeChildAdded (ValueTree& parentTree,
-                                             ValueTree& childWhichHasBeenAdded) override {};
-    inline virtual void valueTreeChildRemoved (ValueTree& parentTree,
-                                               ValueTree& childWhichHasBeenRemoved,
+    virtual void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged,
+                                           const juce::Identifier& property) override;
+    inline virtual void valueTreeChildAdded (juce::ValueTree& parentTree,
+                                             juce::ValueTree& childWhichHasBeenAdded) override {};
+    inline virtual void valueTreeChildRemoved (juce::ValueTree& parentTree,
+                                               juce::ValueTree& childWhichHasBeenRemoved,
                                                int indexFromWhichChildWasRemoved) override {};
-    inline virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
+    inline virtual void valueTreeChildOrderChanged (juce::ValueTree& parentTreeWhoseChildrenHaveMoved,
                                                     int oldIndex, int newIndex) override {};
-    inline virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override {};
-    inline virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override {};
+    inline virtual void valueTreeParentChanged (juce::ValueTree& treeWhoseParentHasChanged) override {};
+    inline virtual void valueTreeRedirected (juce::ValueTree& treeWhichHasBeenChanged) override {};
 private:
-    FilenameComponent fileChooser;
+    juce::FilenameComponent fileChooser;
 
-    AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& valueTreeState;
     // FluidSynthModel& fluidSynthModel;
 
-    String currentPath;
+    juce::String currentPath;
 
 #if JUCE_MAC || JUCE_IOS
     CFURLBookmarkCreationOptions bookmarkCreationOptions;
 #endif
 
-    void filenameComponentChanged (FilenameComponent*) override;
+    void filenameComponentChanged (juce::FilenameComponent*) override;
 
-    bool shouldChangeDisplayedFilePath(const String &path);
+    bool shouldChangeDisplayedFilePath(const juce::String &path);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilePicker)
 };

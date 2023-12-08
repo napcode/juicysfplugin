@@ -9,72 +9,72 @@
 using namespace std;
 
 class Pill
-: public Component
-, public Button::Listener
+: public juce::Component
+, public juce::Button::Listener
 {
 public:
     Pill(
-        AudioProcessorValueTreeState& valueTreeState,
+        juce::AudioProcessorValueTreeState& valueTreeState,
         int bank,
         bool isFirst,
         bool isLast
     );
     ~Pill();
 
-    void buttonClicked(Button* button) override;
+    void buttonClicked(juce::Button* button) override;
 
     void resized() override;
-    void paint(Graphics& g) override;
+    void paint(juce::Graphics& g) override;
 
     void bankChanged(int bank);
 private:
 
-    AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& valueTreeState;
     int bank;
-    TextButton textButton;
+    juce::TextButton textButton;
 
     friend class Pills;
 };
 
 class Pills
-: public Component
-, public ValueTree::Listener
-, public AudioProcessorValueTreeState::Listener
+: public juce::Component
+, public juce::ValueTree::Listener
+, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     Pills(
-        AudioProcessorValueTreeState& valueTreeState
+        juce::AudioProcessorValueTreeState& valueTreeState
     );
     ~Pills();
     
     void cycle(bool right);
 
-    virtual void parameterChanged (const String& parameterID, float newValue) override;
+    virtual void parameterChanged (const juce::String& parameterID, float newValue) override;
 
-    virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
-                                           const Identifier& property) override;
-    inline virtual void valueTreeChildAdded (ValueTree& parentTree,
-                                             ValueTree& childWhichHasBeenAdded) override {};
-    inline virtual void valueTreeChildRemoved (ValueTree& parentTree,
-                                               ValueTree& childWhichHasBeenRemoved,
+    virtual void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged,
+                                           const juce::Identifier& property) override;
+    inline virtual void valueTreeChildAdded (juce::ValueTree& parentTree,
+                                             juce::ValueTree& childWhichHasBeenAdded) override {};
+    inline virtual void valueTreeChildRemoved (juce::ValueTree& parentTree,
+                                               juce::ValueTree& childWhichHasBeenRemoved,
                                                int indexFromWhichChildWasRemoved) override {};
-    inline virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
+    inline virtual void valueTreeChildOrderChanged (juce::ValueTree& parentTreeWhoseChildrenHaveMoved,
                                                     int oldIndex, int newIndex) override {};
-    inline virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override {};
-    inline virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override {};
+    inline virtual void valueTreeParentChanged (juce::ValueTree& treeWhoseParentHasChanged) override {};
+    inline virtual void valueTreeRedirected (juce::ValueTree& treeWhichHasBeenChanged) override {};
 private:
-    void loadModelFrom(ValueTree& banks);
+    void loadModelFrom(juce::ValueTree& banks);
 
-    AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& valueTreeState;
 
     vector<unique_ptr<Pill>> pills;
-    Button *selected;
+    juce::Button *selected;
 
     void updatePillToggleStates();
 
     void populate(int initiallySelectedItem);
     void resized() override;
-    void paint(Graphics& g) override;
+    void paint(juce::Graphics& g) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Pills)
 };

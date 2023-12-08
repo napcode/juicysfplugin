@@ -3,7 +3,10 @@
 //
 
 #include "TablesComponent.h"
+#include <memory>
+#include <fluidsynth.h>
 
+using namespace juce;
 using namespace std;
 using namespace placeholders;
 

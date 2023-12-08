@@ -13,19 +13,19 @@
 
 using namespace std;
 
-class TablesComponent : public Component
+class TablesComponent : public juce::Component
 {
 public:
     TablesComponent(
-        AudioProcessorValueTreeState& valueTreeState
+        juce::AudioProcessorValueTreeState& valueTreeState
     );
 
     void resized() override;
 
-    bool keyPressed(const KeyPress &key) override;
+    bool keyPressed(const juce::KeyPress &key) override;
 
 private:
-    AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& valueTreeState;
 
     Pills banks;
     TableComponent presetTable;

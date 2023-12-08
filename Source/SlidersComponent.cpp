@@ -10,6 +10,9 @@
 #include "FluidSynthModel.h"
 #include "MidiConstants.h"
 #include "Util.h"
+
+using namespace juce;
+
 using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
 
 std::function<void()> SlidersComponent::makeSliderListener(Slider& slider, int controller) {

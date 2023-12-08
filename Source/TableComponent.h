@@ -19,40 +19,40 @@ class TableRow {
 public:
     TableRow(
              int preset,
-             String name
+             juce::String name
              );
 private:
     /** 1-indexed */
-    String getStringContents(int columnId);
+    juce::String getStringContents(int columnId);
 
     int preset;
-    String name;
+    juce::String name;
     
     friend class TableComponent;
 };
 
 
-class TableComponent    : public Component,
-                          public TableListBoxModel,
-                          public ValueTree::Listener,
-                          public AudioProcessorValueTreeState::Listener {
+class TableComponent    : public juce::Component,
+                          public juce::TableListBoxModel,
+                          public juce::ValueTree::Listener,
+                          public juce::AudioProcessorValueTreeState::Listener {
 public:
     TableComponent(
-            AudioProcessorValueTreeState& valueTreeState
+            juce::AudioProcessorValueTreeState& valueTreeState
     );
     ~TableComponent();
 
     int getNumRows() override;
 
     void paintRowBackground (
-            Graphics& g,
+            juce::Graphics& g,
             int rowNumber,
             int width,
             int height,
             bool rowIsSelected
     ) override;
     void paintCell (
-            Graphics& g,
+            juce::Graphics& g,
             int rowNumber,
             int columnId,
             int width,
@@ -68,30 +68,30 @@ public:
 
     void resized() override;
 
-    bool keyPressed(const KeyPress &key) override;
+    bool keyPressed(const juce::KeyPress &key) override;
 
-    virtual void parameterChanged (const String& parameterID, float newValue) override;
+    virtual void parameterChanged (const juce::String& parameterID, float newValue) override;
 
-    virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
-                                           const Identifier& property) override;
-    inline virtual void valueTreeChildAdded (ValueTree& parentTree,
-                                             ValueTree& childWhichHasBeenAdded) override {};
-    inline virtual void valueTreeChildRemoved (ValueTree& parentTree,
-                                               ValueTree& childWhichHasBeenRemoved,
+    virtual void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged,
+                                           const juce::Identifier& property) override;
+    inline virtual void valueTreeChildAdded (juce::ValueTree& parentTree,
+                                             juce::ValueTree& childWhichHasBeenAdded) override {};
+    inline virtual void valueTreeChildRemoved (juce::ValueTree& parentTree,
+                                               juce::ValueTree& childWhichHasBeenRemoved,
                                                int indexFromWhichChildWasRemoved) override {};
-    inline virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
+    inline virtual void valueTreeChildOrderChanged (juce::ValueTree& parentTreeWhoseChildrenHaveMoved,
                                                     int oldIndex, int newIndex) override {};
-    inline virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override {};
-    inline virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override {};
+    inline virtual void valueTreeParentChanged (juce::ValueTree& treeWhoseParentHasChanged) override {};
+    inline virtual void valueTreeRedirected (juce::ValueTree& treeWhichHasBeenChanged) override {};
 private:
-    void loadModelFrom(ValueTree& banks);
+    void loadModelFrom(juce::ValueTree& banks);
     void repopulateTable();
     void selectCurrentPreset();
 
-    AudioProcessorValueTreeState& valueTreeState;
+    juce::AudioProcessorValueTreeState& valueTreeState;
 
-    TableListBox table;     // the table component itself
-    Font font;
+    juce::TableListBox table;     // the table component itself
+    juce::Font font;
 
     typedef multimap<int, TableRow> BanksToPresets;
     BanksToPresets banksToPresets;

@@ -12,6 +12,7 @@
 #include <iterator>
 #include <map>
 
+using namespace juce;
 using namespace std;
 using namespace Util;
 

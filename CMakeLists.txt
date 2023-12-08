@@ -19,6 +19,7 @@ project(JUICY_SF_PLUGIN VERSION 3.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install
 # target), you'll need to tell this project that it depends on the installed copy of JUCE. If you've
@@ -30,11 +31,18 @@ find_package(JUCE CONFIG REQUIRED)        # If you've installed JUCE to your sys
 # add_subdirectory(JUCE)                    # If you've put JUCE in a subdirectory called JUCE
 
 # default to static libraries, since distribution is easier
-option(BUILD_SHARED_LIBS "Build using shared libraries" off)
+option(BUILD_SHARED_LIBS "Build using shared libraries" on)
 set(VST2_SDK_PATH "" CACHE STRING "VST2 SDK path")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 find_package(PkgConfig REQUIRED)
+find_package(FluidSynth REQUIRED)
+find_package(Ogg REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(VORBIS REQUIRED IMPORTED_TARGET vorbis)
+pkg_check_modules(VORBISENC REQUIRED IMPORTED_TARGET vorbisenc)
+pkg_check_modules(VORBISFILE REQUIRED IMPORTED_TARGET vorbisfile)
+pkg_check_modules(FLAC REQUIRED IMPORTED_TARGET flac)
 
 if (BUILD_SHARED_LIBS)
   set(TARGET_STATIC_QUALIFIER "")
@@ -180,13 +188,18 @@ target_link_libraries(JuicySFPlugin
         juce::juce_graphics
         juce::juce_gui_basics
         juce::juce_gui_extra
-        ${FLUIDSYNTH_TARGET}
-        ${EXTRA_ARCH_FLUIDSYNTH_TARGET}
+        ${FLUIDSYNTH_LIBRARIES}
+        ${OGG_LIBRARIES}
+        ${VORBIS_LIBRARIES}
+        ${VORBISENC_LIBRARIES}
+        ${VORBISFILE_LIBRARIES}
+        ${FLAC_LIBRARIES}
+    #    ${EXTRA_ARCH_FLUIDSYNTH_TARGET}
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
-
+set_property(TARGET JuicySFPlugin PROPERTY POSITION_INDEPENDENT_CODE ON)
 # Apple clang doesn't support -static-libgcc flag, but seems to make a portable binary regardless
 if (NOT BUILD_SHARED_LIBS AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ ${CMAKE_EXE_LINKER_FLAGS}")

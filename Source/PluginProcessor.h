@@ -23,7 +23,7 @@ using namespace std;
 //==============================================================================
 /**
 */
-class JuicySFAudioProcessor  : public AudioProcessor
+class JuicySFAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
@@ -38,14 +38,14 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
    #endif
 
-    void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
+    void processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) override;
 
     //==============================================================================
-    AudioProcessorEditor* createEditor() override;
+    juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
 
     //==============================================================================
-    const String getName() const override;
+    const juce::String getName() const override;
 
     bool acceptsMidi() const override;
     bool producesMidi() const override;
@@ -55,28 +55,28 @@ public:
     int getNumPrograms() override;
     int getCurrentProgram() override;
     void setCurrentProgram (int index) override;
-    const String getProgramName (int index) override;
-    void changeProgramName (int index, const String& newName) override;
+    const juce::String getProgramName (int index) override;
+    void changeProgramName (int index, const juce::String& newName) override;
 
     //==============================================================================
-    void getStateInformation (MemoryBlock& destData) override;
+    void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     bool supportsDoublePrecisionProcessing() const override;
 
     FluidSynthModel& getFluidSynthModel();
 
-    MidiKeyboardState keyboardState;
+    juce::MidiKeyboardState keyboardState;
 
 private:
     void initialiseSynth();
 
-    AudioProcessorValueTreeState valueTreeState;
+    juce::AudioProcessorValueTreeState valueTreeState;
 
     FluidSynthModel fluidSynthModel;
-    Synthesiser synth;
+    juce::Synthesiser synth;
 
-    AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
     static BusesProperties getBusesProperties();
 

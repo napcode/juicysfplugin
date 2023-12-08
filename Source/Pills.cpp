@@ -6,6 +6,7 @@
 #include "MyColours.h"
 #include <algorithm>
 
+using namespace juce;
 using namespace std;
 
 Pill::Pill(

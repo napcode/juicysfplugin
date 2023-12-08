@@ -8,6 +8,6 @@
 
 class MyColours {
 public:
-    static Colour getUIColourIfAvailable (LookAndFeel_V4::ColourScheme::UIColour uiColour, Colour fallback);
+    static juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::UIColour uiColour, juce::Colour fallback);
 
 };
